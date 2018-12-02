@@ -7,4 +7,4 @@ main :: IO ()
 main = do
   defaultMain $
     testGroup "Advent of Code 2018 Tests"
-      [(testGroup "Day1 Tests" [correctFrequency])]
+      [(testGroup "Day1 Tests" [correctFrequency, correctRepeatingFrequency])]
