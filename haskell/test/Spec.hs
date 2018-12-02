@@ -9,4 +9,4 @@ main = do
   defaultMain $
     testGroup "Advent of Code 2018 Tests"
       [ (testGroup "Day1 Tests" [correctFrequency, correctRepeatingFrequency])
-      , (testGroup "Day2 Tests" [correctChecksum])]
+      , (testGroup "Day2 Tests" [correctChecksum, correctCommonIdCharacters])]

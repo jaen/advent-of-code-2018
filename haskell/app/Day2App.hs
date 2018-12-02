@@ -6,3 +6,5 @@ main = do
   input <- parseInput <$> readInput "Day2"
 
   putStrLn $ show $ checksum input
+  putStrLn $ commonIdCharacters input
+

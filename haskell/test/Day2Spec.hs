@@ -1,5 +1,6 @@
 module Day2Spec
   ( correctChecksum
+  , correctCommonIdCharacters
   )
 where
 
@@ -22,3 +23,18 @@ correctChecksum =
           , "aabcdd"
           , "abcdee"
           , "ababab" ]
+
+correctCommonIdCharacters :: TestTree
+correctCommonIdCharacters =
+    testGroup "Testing commonIdCharacters for sample frequencies"
+      $ [ testCase "common characters of input are " $ "fgij" @?= (subject input)
+        ]
+   where
+    subject = commonIdCharacters
+    input = [ "abcde"
+            , "fghij"
+            , "klmno"
+            , "pqrst"
+            , "fguij"
+            , "axcye"
+            , "wvxyz" ]
