@@ -11,4 +11,4 @@ main = do
     testGroup "Advent of Code 2018 Tests"
       [ (testGroup "Day1 Tests" [ correctFrequency, correctRepeatingFrequency ])
       , (testGroup "Day2 Tests" [ correctChecksum, correctCommonIdCharacters ])
-        (testGroup "Day3 Tests" [ correctOverlappingClaimArea ]) ]
+      , (testGroup "Day3 Tests" [ correctOverlappingClaimArea, correctNonOverlappingClaimId ]) ]

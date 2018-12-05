@@ -4,6 +4,7 @@
 
 module Day3
   ( overlappingClaimArea
+  , nonOverlappingClaimId
   , parseInput
   )
 where
@@ -19,10 +20,14 @@ import           Data.Maybe
 
 import qualified Data.Map.Strict                 as Map
 import           Data.Map.Strict (Map, (!?))
+import qualified Data.Set                        as Set
+import           Data.Set (Set)
 
 import           Control.Monad
 import           Data.STRef.Lazy
 import           Control.Monad.ST.Lazy
+
+import Debug.Trace
 
 type Point =
   ( Int, Int )
@@ -56,22 +61,62 @@ overlappingClaimArea claims =
     area
   where
     area :: Int
-    area = Map.size (Map.filter (> 1) claimMap)
+    area = Map.size overlappingClaims
 
-    claimMap :: Map Point Int
-    claimMap = runST $ do
-      map' <- newSTRef $ Map.empty
+    overlappingClaims :: Map Point (Set Int)
+    overlappingClaims =
+      Map.filter (Set.size .> (> 1)) claimMap
 
-      let positions = concatMap positionsInClaim claims
+    claimMap :: Map Point (Set Int)
+    claimMap = runST $ computeClaimMap claims
 
-      forM_ positions $ \position -> do
-        map'' <- readSTRef map'
+nonOverlappingClaimId :: [Claim] -> Int
+nonOverlappingClaimId claims =
+    claimId
+  where
+    claimId :: Int
+    claimId = (Map.filter (Set.intersection overlappingClaimIds
+                            .> Set.size
+                            .> (== 0))
+                          claimMap)
+      |> Map.toList
+      |> head
+      |> (\(_, ids) -> ids)
+      |> Set.toList
+      |> head
 
-        let claimCount = fromMaybe 0 (map'' !? position) + 1
+    overlappingClaimIds :: Set Int
+    overlappingClaimIds =
+      Map.filter (Set.size .> (> 1)) claimMap
+        |> Map.foldl Set.union Set.empty
 
-        writeSTRef map' (Map.insert position claimCount map'')
 
-      readSTRef map'
+    claimMap :: Map Point (Set Int)
+    claimMap = runST $ computeClaimMap claims
+
+computeClaimMap :: [Claim] -> ST s (Map Point (Set Int))
+computeClaimMap claims = do
+    map' <- newSTRef $ Map.empty
+
+    let positions = concatMap positionsInClaim' claims
+
+    forM_ positions (uncurry insertClaim .> modifySTRef map')
+
+    -- equivalent to
+
+    -- forM_ positions $ \(id, position) -> do
+    --   modifySTRef map' $ insertClaim id position
+
+    readSTRef map'
+  where
+    insertClaim :: Int -> Point -> Map Point (Set Int) -> Map Point (Set Int)
+    insertClaim id position =
+      Map.insertWith Set.union position (Set.singleton id)
+
+    -- TODO: make less ugly
+    positionsInClaim' :: Claim -> [(Int, Point)]
+    positionsInClaim' claim@(Claim { id }) =
+      map (\position -> ( id, position )) $ positionsInClaim claim
 
 -- parsing
 
